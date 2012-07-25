@@ -3,12 +3,21 @@
 from pyquery import PyQuery as pq
 import re
 import sys
+import getopt
 
-if len(sys.argv) < 3:
+opts, args = getopt.getopt(sys.argv[1:], "u")
+
+if len(args) < 2:
 	raise Exception('Arguments not enough')
 
-url = sys.argv[1]
-selector = sys.argv[2]
+need_url = False
+
+for o, a in opts:
+	if o == "-u":
+		need_url = True
+
+url = args[0]
+selector = args[1]
 
 doc = pq(url)
 
@@ -23,5 +32,8 @@ items = doc(selector)
 items.each(cb)
 
 for t in result:
-	print re.sub(r'[\r\n]', ' ', t)
+	if need_url:
+		print url + "|" + re.sub(r'[\r\n]', ' ', t)
+	else:
+		print re.sub(r'[\r\n]', ' ', t)
 
