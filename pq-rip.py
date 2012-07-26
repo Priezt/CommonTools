@@ -6,16 +6,19 @@ import sys
 import getopt
 from urlparse import urljoin
 
-opts, args = getopt.getopt(sys.argv[1:], "u")
+opts, args = getopt.getopt(sys.argv[1:], "ur")
 
 if len(args) < 2:
 	raise Exception('Arguments not enough')
 
 need_url = False
+need_reverse = False
 
 for o, a in opts:
 	if o == "-u":
 		need_url = True
+	if o == "-r":
+		need_reverse = True
 
 url = args[0]
 selector = args[1]
@@ -39,6 +42,9 @@ def cb(idx, node):
 items = doc(selector)
 
 items.each(cb)
+
+if need_reverse:
+	items.reverse()
 
 for t in result:
 	print t
