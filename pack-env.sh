@@ -4,7 +4,6 @@ TMPBASE=/tmp
 TMPDIR=$TMPBASE/pack-env-tmp
 PACKFILE=$HOME/env.tar
 
-rm $PACKFILE
 rm -rf $TMPDIR
 mkdir $TMPDIR
 
