@@ -20,7 +20,7 @@ else
 	die 'either upload or download'
 end
 
-unless remote_file =~ /^(.+)\/(.+)$/
+unless remote_file =~ /^(.+?)\/(.+)$/
 	die 'remote file format wrong'
 end
 
