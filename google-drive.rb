@@ -3,38 +3,96 @@
 require 'google_drive'
 require 'highline/import'
 
-if ARGV.length != 3
+$session = nil
+$email = nil
+$local_file = nil
+$remote_file = nil
+$cmd = nil
+
+def print_help
 	puts 'Usage:'
-	puts "\t google-drive.rb upload /path/to/file name@gmail.com/filename"
-	puts "\t google-drive.rb download name@gmail.com/filename /path/to/file"
+	puts "\t google-drive.rb email upload localfile remotefile [-d foldername]"
+	puts "\t google-drive.rb email download remotefile localfile"
+	puts "\t google-drive.rb email list foldername [-u]"
+	puts "\t google-drive.rb email mirror foldername localfolder"
 	exit
 end
 
-if ARGV[0] == 'upload'
-	local_file = ARGV[1]
-	remote_file = ARGV[2]
-elsif ARGV[0] == 'download'
-	local_file = ARGV[2]
-	remote_file = ARGV[1]
-else
-	die 'either upload or download'
+def get_gmail_pass
+	if ENV['GMAIL_PASS']
+		return ENV['GMAIL_PASS']
+	else
+		return ask("Password: "){|q| q.echo = false}
+	end
 end
 
-unless remote_file =~ /^(.+?)\/(.+)$/
-	die 'remote file format wrong'
+def login
+	$session = GoogleDrive.login($email, get_gmail_pass)
 end
 
-email = $1
-remote_file = $2
-
-password = ask("Password: "){|q| q.echo = false}
-
-session = GoogleDrive.login(email, password)
-
-if ARGV[0] == 'upload'
-	session.upload_from_file(local_file, remote_file, :convert => false)
-else
-	file = session.file_by_title(remote_file)
-	file.download_to_file(local_file)
+if ARGV.length < 2
+	print_help
 end
+
+$email = ARGV[0]
+$cmd = ARGV[1]
+
+case $cmd
+	when 'upload'
+		login
+		$local_file = ARGV[2]
+		$remote_file = ARGV[3]
+		file = $session.upload_from_file($local_file, $remote_file, :convert => false)
+		if ARGV[4] == '-d'
+			collection = $session.collection_by_title(ARGV[5])
+			if collection
+				collection.add(file)
+			else
+				puts 'No such collection: ' + ARGV[5]
+			end
+		end
+	when 'download'
+		login
+		$local_file = ARGV[3]
+		$remote_file = ARGV[2]
+		file = $session.file_by_title($remote_file)
+		if file
+			file.download_to_file($local_file)
+		else
+			puts 'File not found: ' + $remote_file
+		end
+	when 'list'
+		login
+		collection = $session.collection_by_title(ARGV[2])
+		if collection
+			collection.files.each{
+				|f|
+				if ARGV[3] == '-u'
+					puts f.title + '|' + f.document_feed_url
+				else
+					puts f.title
+				end
+			}
+		else
+			puts 'No such collection: ' + ARGV[2]
+		end
+	when 'mirror'
+		login
+		collection = $session.collection_by_title(ARGV[2])
+		target_dir = ARGV[3]
+		if collection
+			system('mkdir -p ' + target_dir)
+			collection.files.each{
+				|f|
+				puts f.title
+				f.download_to_file(target_dir + '/' + f.title)
+				
+			}
+		else
+			puts 'No such collection: ' + ARGV[2]
+		end
+	else
+		puts 'No such command: ' + $cmd
+end
+
 
