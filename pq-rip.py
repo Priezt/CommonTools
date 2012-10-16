@@ -26,6 +26,9 @@ for o, a in opts:
 url = args[0]
 selector = args[1]
 
+if url == '-':
+	url = sys.stdin.read()
+
 doc = pq(url)
 
 result = []
