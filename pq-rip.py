@@ -6,14 +6,12 @@ import sys
 import getopt
 from urlparse import urljoin
 
-opts, args = getopt.getopt(sys.argv[1:], "ura:")
-
-if len(args) < 2:
-	raise Exception('Arguments not enough')
+opts, args = getopt.getopt(sys.argv[1:], "ura:s:")
 
 need_url = False
 need_reverse = False
 need_attribute = False
+need_stdin = False
 
 for o, a in opts:
 	if o == "-u":
@@ -22,12 +20,16 @@ for o, a in opts:
 		need_reverse = True
 	if o == "-a":
 		need_attribute = a
+	if o == "-s":
+		need_stdin = a
 
-url = args[0]
-selector = args[1]
-
-if url == '-':
+if need_stdin:
 	url = sys.stdin.read()
+	selector = args[0]
+else:
+	url = args[0]
+	selector = args[1]
+
 
 doc = pq(url)
 
@@ -44,6 +46,8 @@ def cb(idx, node):
 			if href:
 				href = urljoin(url, href)
 				txt = href + "|" + txt
+			elif need_stdin:
+				txt = need_stdin + "|" + txt
 			else:
 				txt = url + "|" + txt
 	result.append(txt)
