@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 port = ARGV.shift or throw "need port"
-interval = (ARGV.shift or '5').to_i
+interval = (ARGV.shift or '60').to_i
 
 loop do
 	sleep interval
