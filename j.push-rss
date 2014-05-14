@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+name = ARGV.shift or raise "need name"
+
+def mkdir_p(d)
+	if not File.directory? d
+		Dir.mkdir d
+	end
+end
+
+mkdir_p ENV["HOME"] + "/.jrss"
+mkdir_p ENV["HOME"] + "/.jrss/" + name
+
+current_id = 1
+if Dir[ENV["HOME"] + "/.jrss/" + name + "/*"].count > 0
+	current_id = Dir[ENV["HOME"] + "/.jrss/" + name + "/*"].sort.last.sub(/.*\//, "").to_i + 1
+end
+
+STDIN.lines.each do |l|
+	File.open(ENV["HOME"] + "/.jrss/" + name + "/" + sprintf("%08d", current_id), "w") do |f|
+		f.write l
+	end
+	current_id += 1
+end

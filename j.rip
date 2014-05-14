@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+
+# encoding: utf-8
+
+require 'open-uri'
+require 'nokogiri'
+require 'uri'
+require 'optparse'
+require 'json'
+
+params = ARGV.getopts("u:")
+
+url = ARGV.shift
+item_selector = ARGV.shift
+title_selector = ARGV.shift
+link_selector = ARGV.shift || "a"
+image_selector = ARGV.shift || 'img'
+
+if url =~ /^http/
+	page = Nokogiri::HTML(open(url))
+else
+	page = Nokogiri::HTML(File.open(url))
+	url = params["u"] || raise("need -u")
+end
+
+page.css(item_selector).each do |item|
+	j = {}
+	j["title"] = if title_selector then item.css(title_selector).first.text.gsub(/\s+/, ' ') else item.text.gsub(/\s+/, ' ') end
+	if item.css(link_selector).count > 0
+		j["link"] = URI.join(url, item.css(link_selector).first.attr("href"))
+	else
+		j["link"] = url
+	end
+	if item.css(image_selector).count > 0
+		j["image"] = item.css(image_selector).first.attr("src")
+	else
+		j["image"] = "http://www.acsu.buffalo.edu/~rslaine/imageNotFound.jpg"
+	end
+	j["description"] = item.text
+	puts j.to_json
+end

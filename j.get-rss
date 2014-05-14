@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+
+#require 'rss/2.0'
+require 'rss/maker'
+require 'json'
+
+name = ARGV.shift or raise "need name"
+
+dir = ENV["HOME"] + "/.jrss/" + name
+
+#content = RSS::Rss.new('2.0')
+#channel = RSS::Rss::Channel.new
+#channel.title = name
+#channel.description = name
+#channel.link = "http://priezt.me/rss/"
+#
+#Dir[dir + "/*"].sort.last(10).each do |fn|
+#	h = JSON.parse(File.open(fn).read())
+#	item = RSS::Rss::Channel::Item.new
+#	item.title = h["title"]
+#	item.link = h["link"]
+#	item.guid = RSS::Rss::Channel::Item::Guid.new
+#	item.guid.content = h["link"]
+#	item.guid.isPermaLink = true
+#	item.content_encoded = "<![CDATA[<img src=\"#{h["image"]}\"><br>" + h["description"] + "]]>"
+#	item.date = Time.now
+#	channel.items << item
+#end
+#
+#content.channel = channel
+
+content = RSS::Maker.make('2.0') do |m|
+	m.channel.title = name
+	m.channel.about = name
+	m.channel.description = name
+	m.channel.link = "http://priezt.me/rss/"
+	Dir[dir + "/*"].sort.last(10).each do |fn|
+		h = JSON.parse(File.open(fn).read())
+		m.items.new_item do |item|
+			item.title = h["title"]
+			item.link = h["link"]
+			#item.description = "<![CDATA[<img src=\"#{h["image"]}\"><br>" + h["description"] + "]]>"
+			item.description = "<img src=\"#{h["image"]}\"><br>" + h["description"]
+			item.updated = Time.now
+		end
+	end
+end
+
+puts content.to_s
