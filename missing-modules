@@ -1,0 +1,13 @@
+#!/usr/bin/env perl 
+
+$type = shift @ARGV or die "need type:perl/ruby/python";
+$type = lc($type);
+
+open IMPORT_LINES, "all-modules $type |";
+while(<IMPORT_LINES>){
+	chomp;
+	my $output = `echo "$_" | $type 2>&1`;
+	next if $output eq '';
+	print $output;
+}
+close IMPORT_LINES;
