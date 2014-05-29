@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+
+$type = shift @ARGV or die "need type:perl/ruby/python";
+$type = lc($type);
+
+if($type eq 'perl'){
+	system("find . | grep -v .git | xargs -I , file ,  | grep 'Perl script' | sed 's/:.*//' | xargs -I , cat , | grep ^use | sort | uniq");
+}elsif($type eq 'python'){
+	system("find . | grep -v .git | xargs -I , file ,  | grep 'Python script' | sed 's/:.*//' | xargs -I , cat , | grep ^import | sort | uniq");
+}elsif($type eq 'ruby'){
+	system("find . | grep -v .git | xargs -I , file ,  | grep 'Ruby script' | sed 's/:.*//' | xargs -I , cat , | grep ^require | sort | uniq");
+}
+
+
