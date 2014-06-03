@@ -16,7 +16,7 @@ if Dir[ENV["HOME"] + "/.jrss/" + name + "/*"].count > 0
 	current_id = Dir[ENV["HOME"] + "/.jrss/" + name + "/*"].sort.last.sub(/.*\//, "").to_i + 1
 end
 
-STDIN.lines.each do |l|
+STDIN.each_line do |l|
 	File.open(ENV["HOME"] + "/.jrss/" + name + "/" + sprintf("%08d", current_id), "w") do |f|
 		f.write l
 	end

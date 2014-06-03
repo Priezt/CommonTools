@@ -32,7 +32,7 @@ page.css(item_selector).each do |item|
 		j["link"] = url
 	end
 	if item.css(image_selector).count > 0
-		j["image"] = item.css(image_selector).first.attr("src")
+		j["image"] = URI.join(url, item.css(image_selector).first.attr("src"))
 	else
 		j["image"] = "http://www.acsu.buffalo.edu/~rslaine/imageNotFound.jpg"
 	end
