@@ -1,0 +1,11 @@
+#!/usr/bin/env perl
+
+use JSON;
+
+$k = shift @ARGV or die 'need key';
+
+while(<>){
+	chomp;
+	my $obj = from_json($_);
+	print $obj->{$k}."\n";
+}
