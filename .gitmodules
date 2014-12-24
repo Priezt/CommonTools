@@ -1,0 +1,3 @@
+[submodule "subs/youdao-dict"]
+	path = subs/youdao-dict
+	url = https://github.com/qhwa/Command-Line-Youdao-Dictionary.git
