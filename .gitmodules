@@ -1,3 +1,6 @@
 [submodule "subs/youdao-dict"]
 	path = subs/youdao-dict
 	url = https://github.com/qhwa/Command-Line-Youdao-Dictionary.git
+[submodule "subs/desk"]
+	path = subs/desk
+	url = https://github.com/jamesob/desk.git
