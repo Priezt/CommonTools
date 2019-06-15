@@ -3,6 +3,7 @@
 # encoding: utf-8
 
 require 'open-uri'
+require 'open_uri_redirections'
 require 'nokogiri'
 require 'uri'
 require 'optparse'
@@ -17,7 +18,7 @@ link_selector = ARGV.shift || "a"
 image_selector = ARGV.shift || 'img'
 
 if url =~ /^http/
-	page = Nokogiri::HTML(open(url))
+	page = Nokogiri::HTML(open(url, :allow_redirections => :all))
 else
 	page = Nokogiri::HTML(File.open(url))
 	url = params["u"] || raise("need -u")
